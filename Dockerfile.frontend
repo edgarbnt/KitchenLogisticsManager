@@ -1,0 +1,14 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY kitchen-log/package*.json ./
+RUN npm install
+
+# On copie le reste du code (sera surchargé par le volume en dev)
+COPY kitchen-log/ .
+
+EXPOSE 3000
+
+# Commande de dev avec Hot Reload
+CMD ["npm", "run", "dev"]
