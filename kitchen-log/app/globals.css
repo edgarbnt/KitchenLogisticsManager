@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-emerald-500: #10b981;
+  --color-slate-50: #f8fafc;
+  --color-slate-900: #0f172a;
+}
+
+@layer base {
+  body {
+    @apply bg-[#f8fafc] text-slate-900 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  .custom-card {
+    @apply bg-white border border-slate-200 shadow-sm rounded-[2.5rem] transition-all duration-300;
+  }
+
+  /* Style pour la scrollbar pour rester propre */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full;
+  }
+}

@@ -1,0 +1,16 @@
+export const UNITS = [
+    { label: "Grammes (g)", value: "g" },
+    { label: "Kilogrammes (kg)", value: "kg" },
+    { label: "Millilitres (ml)", value: "ml" },
+    { label: "Litres (l)", value: "l" },
+    { label: "Unités (u)", value: "unit" },
+    { label: "Cuillère à soupe", value: "c.à.s" },
+    { label: "Cuillère à café", value: "c.à.c" },
+    { label: "Pincée", value: "pincée" },
+    { label: "Gousse", value: "gousse" },
+    { label: "Botte", value: "botte" },
+    { label: "Sachet", value: "sachet" },
+    { label: "Tranche", value: "tranche" },
+    { label: "Pot", value: "pot" },
+    { label: "Boite", value: "boite" },
+];
