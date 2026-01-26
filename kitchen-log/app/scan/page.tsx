@@ -10,6 +10,7 @@ export default function ScanPage() {
     const [extracted, setExtracted] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -31,8 +32,16 @@ export default function ScanPage() {
     };
 
     const confirmAll = async () => {
-        // Note: Logique pour ajouter chaque item détecté au stock
-        router.push('/inventory');
+        if (extracted.length === 0) return;
+
+        setIsSaving(true);
+        try {
+            await api.addBulkToPantry(extracted);
+            router.push('/inventory');
+        } catch (err) {
+            setError("Erreur lors de l'enregistrement dans le stock.");
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -111,9 +120,14 @@ export default function ScanPage() {
                     {extracted.length > 0 && (
                         <button
                             onClick={confirmAll}
-                            className="mt-8 w-full py-6 bg-emerald-500 text-white rounded-[2.2rem] font-black shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all flex items-center justify-center gap-3 tracking-widest"
+                            disabled={isSaving}
+                            className={`mt-8 w-full py-6 bg-emerald-500 text-white rounded-[2.2rem] font-black shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all flex items-center justify-center gap-3 tracking-widest ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            AJOUTER AU STOCK <ArrowRight size={22} />
+                            {isSaving ? (
+                                <> <Loader2 className="animate-spin" /> ENREGISTREMENT... </>
+                            ) : (
+                                <> AJOUTER AU STOCK <ArrowRight size={22} /> </>
+                            )}
                         </button>
                     )}
                 </div>

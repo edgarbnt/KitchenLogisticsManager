@@ -41,10 +41,9 @@ class MealPlan(Base):
     __tablename__ = "meal_plans"
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
-    slot = Column(String) # LUNCH, DINNER
+    slot = Column(String) # LUNCH, DINNER, ANY...
     recipe_id = Column(Integer, ForeignKey("recipes.id"))
     recipe = relationship("Recipe")
-    __table_args__ = (UniqueConstraint('date', 'slot', name='_date_slot_uc'),)
 
 class ShoppingList(Base):
     __tablename__ = "shopping_list"

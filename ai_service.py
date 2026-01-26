@@ -1,67 +1,62 @@
 import os
 import json
 import re
+import time
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialisation du nouveau client
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-def get_flash_model_name():
-    """Détermine dynamiquement le nom du modèle Flash disponible avec le nouveau SDK."""
-    try:
-        # On liste les modèles via le nouveau client
-        for m in client.models.list():
-            # On cherche 'flash' dans le nom et le support de la génération de contenu
-            if 'flash' in m.name.lower() and 'generateContent' in m.supported_generation_methods:
-                return m.name
-        return 'gemini-1.5-flash' # Fallback
-    except Exception as e:
-        print(f"Erreur lors du listage des modèles : {e}")
-        return 'gemini-1.5-flash'
-
 def scan_receipt_with_gemini(image_bytes: bytes):
-    model_name = get_flash_model_name()
-    print(f"--- Utilisation du modèle (SDK v1) : {model_name} ---")
+    # Liste des noms de modèles à essayer par ordre de priorité
+    # gemini-flash-latest est souvent le nom 'alias' qui fonctionne sur le Tier Gratuit
+    model_candidates = ['gemini-1.5-flash', 'gemini-flash-latest', 'gemini-1.5-flash-002']
     
-    try:
-        prompt = """
-        Analyze this grocery receipt. Extract all food items. 
-        Return ONLY a JSON array of objects:
-        [{"name": "string", "quantity": number, "unit": "string"}].
-        Normalize units to 'kg', 'g', 'l', or 'unit'. 
-        Return ONLY the raw JSON.
-        """
+    last_error = None
 
-        # Envoi de la requête avec le nouveau SDK
-        response = client.models.generate_content(
-            model=model_name,
-            contents=[
-                prompt,
-                types.Part.from_bytes(data=image_bytes, mime_type='image/jpeg')
-            ]
-        )
-
-        # Récupération du texte
-        text = response.text
-        
-        # Logique d'extraction JSON identique à ton ancienne version (très fiable)
-        match = re.search(r'\[.*\]', text, re.DOTALL)
-        if match:
-            return json.loads(match.group(0))
-        
-        clean_json = text.replace('```json', '').replace('```', '').strip()
-        return json.loads(clean_json)
-
-    except Exception as e:
-        print(f"ERREUR CRITIQUE AI : {str(e)}")
-        # Aide au debug en cas d'échec
+    for model_name in model_candidates:
         try:
-            available = [m.name for m in client.models.list()]
-            print(f"Modèles disponibles sur ce compte : {available}")
-        except:
-            pass
-        raise e
+            print(f"--- Tentative avec le modèle : {model_name} ---")
+            
+            prompt = """
+            Analyze this grocery receipt. Extract all food items. 
+            Return ONLY a JSON array of objects:
+            [{"name": "string", "quantity": number, "unit": "string"}].
+            Normalize units to 'kg', 'g', 'l', or 'unit'. 
+            Return ONLY the raw JSON.
+            """
+
+            response = client.models.generate_content(
+                model=model_name,
+                contents=[
+                    prompt,
+                    types.Part.from_bytes(data=image_bytes, mime_type='image/jpeg')
+                ]
+            )
+
+            text = response.text
+            # Nettoyage JSON
+            text = text.replace('```json', '').replace('```', '').strip()
+            match = re.search(r'\[.*\]', text, re.DOTALL)
+            
+            if match:
+                return json.loads(match.group(0))
+            return json.loads(text)
+
+        except Exception as e:
+            last_error = e
+            error_msg = str(e)
+            print(f"Échec avec {model_name}: {error_msg[:100]}...")
+            
+            # Si c'est une erreur de quota (429), on attend 2 secondes et on change de modèle
+            if "429" in error_msg:
+                time.sleep(2)
+            # On continue la boucle pour essayer le modèle suivant
+            continue
+
+    # Si on arrive ici, aucun modèle n'a fonctionné
+    print(f"ERREUR FATALE AI : Aucun modèle n'a répondu favorablement.")
+    raise last_error
