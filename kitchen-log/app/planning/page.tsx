@@ -146,7 +146,14 @@ export default function PlanningPage() {
                             <ul className="space-y-3">
                                 {summaryData?.added.map((item, i) => (
                                     <li key={i} className="flex justify-between items-center bg-emerald-50/50 p-3 rounded-xl">
-                                        <span className="font-bold text-slate-800 capitalize">{item.name}</span>
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-slate-800 capitalize">{item.name}</span>
+                                            {item.stock > 0 && (
+                                                <span className="text-[10px] font-bold text-emerald-700/70">
+                                                    Déjà {item.stock} en stock (Besoin: {item.needed})
+                                                </span>
+                                            )}
+                                        </div>
                                         <div className="text-right">
                                             <span className="font-black text-emerald-600 text-lg block leading-none">{item.added_qty}</span>
                                             <span className="text-[10px] uppercase font-bold text-slate-400">{item.unit}</span>
