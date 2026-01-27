@@ -50,7 +50,7 @@ export default function RecipesPage() {
         setIsModalOpen(true);
     };
 
-    const handleAddToPlan = async (e: React.MouseEvent, recipeId: number) => {
+    const handleAddToPlan = async (e: React.MouseEvent, recipeId: string) => {
         e.stopPropagation();
         try {
             await api.addToMealPlan(recipeId);

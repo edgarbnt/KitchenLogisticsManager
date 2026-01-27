@@ -31,7 +31,7 @@ export default function InventoryPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         if (!confirm("Supprimer cet article du stock ?")) return;
         try {
             await api.deletePantryItem(id);

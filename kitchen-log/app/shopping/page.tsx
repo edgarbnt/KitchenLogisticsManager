@@ -19,7 +19,7 @@ export default function ShoppingPage() {
         setList(sorted);
     };
 
-    const handleToggle = async (id: number) => {
+    const handleToggle = async (id: string) => {
         await api.toggleShoppingItem(id);
         refresh();
     };

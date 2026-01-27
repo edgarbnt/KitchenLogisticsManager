@@ -35,7 +35,7 @@ export default function PlanningPage() {
         }
     };
 
-    const handleCook = async (planId: number) => {
+    const handleCook = async (planId: string) => {
         await api.cookRecipe(planId);
         setSelectedRecipe(null);
         refresh();

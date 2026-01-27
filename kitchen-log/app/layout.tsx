@@ -2,10 +2,29 @@ import Sidebar from '@/components/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import './globals.css';
 import React from 'react';
+import type { Metadata, Viewport } from "next";
 
-export const metadata = {
-  title: 'Kitchen Logistics Manager Pro',
-  description: 'Gérez votre cuisine intelligemment',
+
+export const metadata: Metadata = {
+  title: "KitchenLog",
+  description: "Gérez votre cuisine",
+  manifest: "/manifest.json", // Généré automatiquement par next
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "KitchenLog",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#10b981",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Empêche le zoom sur mobile (sensation app native)
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
